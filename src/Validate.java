@@ -1,7 +1,10 @@
-package src;
+//package src;
+
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+
 
 public class Validate {
 
@@ -11,7 +14,7 @@ public class Validate {
     return match.matches();
   }
 
-  private static boolean minor(int age) {
+  public static boolean minor(int age) {
 		if(age > 17) {
 			return false;
 		}
@@ -19,7 +22,7 @@ public class Validate {
 		return true;
 	}
 
-  private static boolean email(String input) {
+  public static boolean email(String input) {
 		if(input.contains("@") && input.contains("."))
       return true;
 		
@@ -58,6 +61,11 @@ public class Validate {
    * TODO: Does this look correct? Can you improve it to pass more tests?
    */
   public static char grade(Double value) {
+    if (value == null || value.isNaN()){
+      throw new IllegalArgumentException();
+
+    }
+    
     if(value < 60){
       return 'F';
     }else if(value < 70){
@@ -66,43 +74,42 @@ public class Validate {
       return 'C';
     }else if(value < 90){
       return 'B';
+    } else {return 'A';
     }
-
-    return 'A';
   }
 
   /**
    * TODO: Does this look correct? Can you improve it to pass more tests?
    */
   public static String sanitize(String sql) {
-    sql = sql.toUpperCase().replaceAll("ADMIN", "");
-    sql = sql.toUpperCase().replaceAll("OR", "");
-    sql = sql.toUpperCase().replaceAll("COLLATE", "");
-    sql = sql.toUpperCase().replaceAll("DROP", "");
-    sql = sql.toUpperCase().replaceAll("AND", "");
-    sql = sql.toUpperCase().replaceAll("UNION", "");
-    sql = sql.replaceAll("/*", "");
-    sql = sql.replaceAll("*/", "");
-    sql = sql.replaceAll("//", "");
-    sql = sql.replaceAll(";", "");
-    sql = sql.replaceAll("||", "");
-    sql = sql.replaceAll("&&", "");
-    sql = sql.replaceAll("--", "");
-    sql = sql.replaceAll("#", "");
-    sql = sql.replaceAll("=", "");
-    sql = sql.replaceAll("!=", "");
-    sql = sql.replaceAll("<>", "");
+    if (sql == null){
+      return "";
+    }
+    sql = sql.toUpperCase();
+    String[] words = {"ADMIN", "OR", "COLLATE", "DROP", "AND", "UNION"};
+    for (String keyword : words) {
+        sql = sql.replace(keyword, "");
+    }
+    String[] Chars = {"/*", "*/", "//", ";", "||", "&&", "--", "#", "=", "!=", "<>"};
+    for (String ch : Chars) {
+        sql = sql.replaceAll(Pattern.quote(ch), "");
+    }
 
     return sql;
   }
 
+
   /**
    * TODO: Does this look correct? Can you improve it to pass more tests?
    */
-  public static String stripNull(String filter) {
-    filter = filter.toUpperCase().replace("NULL", "");
+  public static String stripNull(String sn) {
+    sn = sn.toUpperCase().replace("NULL", "");
+    
+    if (sn == null) {
+      return "";  
+    }
 
-    return filter;
+    return sn.replaceAll("\\bNULL\\b", "");
   }
 
   /**
@@ -110,7 +117,8 @@ public class Validate {
    * Consider white-listing, regex
    */
   public static boolean ip(String input){
-    return true;
+    String regex = "\\b((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\b";
+    return Pattern.matches(regex, input);
   }
 
   /**
@@ -119,7 +127,7 @@ public class Validate {
    * allow : - and whitespaces
    */
   public static boolean mac(String input){
-    return true;
+    return Pattern.matches("^([0-9A-Fa-f]{2}[:-]?){5}([0-9A-Fa-f]{2})$", input);
   }
 
   /**
@@ -127,6 +135,13 @@ public class Validate {
    * Consider white-listing, regex
    */
   public static boolean md5(String input){
-    return true;
+    return Pattern.matches("^[a-fA-F0-9]{32}$", input);
   }
+
+
+
+
+
+
+
 }
